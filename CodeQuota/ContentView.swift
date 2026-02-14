@@ -5,6 +5,7 @@ struct ContentView: View {
     @StateObject private var copilotUsage = CopilotUsageManager.shared
     @StateObject private var anthropicAuth = AnthropicAuthManager.shared
     @StateObject private var githubAuth = GitHubAuthManager.shared
+    @StateObject private var settings = MenuBarSettings.shared
     @State private var isRefreshing = false
     @State private var showSettings = false
     
@@ -38,12 +39,12 @@ struct ContentView: View {
                     .padding(.bottom, 24)
                 
                 // Claude section
-                if anthropicAuth.isConnected {
+                if anthropicAuth.isConnected && hasVisibleClaudeMetrics {
                     claudeSection
                 }
                 
                 // Copilot section
-                if githubAuth.isConnected {
+                if githubAuth.isConnected && settings.isVisible(.copilotPremium) {
                     copilotSection
                 }
                 
@@ -112,29 +113,50 @@ struct ContentView: View {
                     .padding(.vertical, 12)
                     .padding(.horizontal, 24)
             case .loaded(let usage):
-                // Gradient tiles from alt-5
                 VStack(spacing: 8) {
-                    GradientTile(
-                        icon: "clock.fill",
-                        title: "5-Hour Session",
-                        percentage: usage.fiveHour.percent,
-                        detail: "Resets in: \(usage.fiveHour.timeRemainingString)"
-                    )
+                    if settings.isVisible(.claude5Hour) {
+                        GradientTile(
+                            icon: "clock.fill",
+                            title: "5-Hour Session",
+                            percentage: usage.fiveHour.percent,
+                            detail: "Resets in: \(usage.fiveHour.timeRemainingString)"
+                        )
+                    }
                     
-                    HStack(spacing: 8) {
+                    let showWeeklyAll = settings.isVisible(.claudeWeeklyAll)
+                    let showSonnet = settings.isVisible(.claudeWeeklySonnet)
+                    
+                    if showWeeklyAll && showSonnet {
+                        // Both visible — side by side
+                        HStack(spacing: 8) {
+                            GradientTile(
+                                icon: "calendar",
+                                title: "Weekly All",
+                                percentage: usage.dailyAllModels.percent,
+                                detail: usage.dailyAllModels.timeRemainingString,
+                                compact: true
+                            )
+                            GradientTile(
+                                icon: "sparkles",
+                                title: "Sonnet",
+                                percentage: usage.dailySonnet.percent,
+                                detail: usage.dailySonnet.timeRemainingString,
+                                compact: true
+                            )
+                        }
+                    } else if showWeeklyAll {
                         GradientTile(
                             icon: "calendar",
-                            title: "Weekly All",
+                            title: "Weekly — All Models",
                             percentage: usage.dailyAllModels.percent,
-                            detail: usage.dailyAllModels.timeRemainingString,
-                            compact: true
+                            detail: usage.dailyAllModels.timeRemainingString
                         )
+                    } else if showSonnet {
                         GradientTile(
                             icon: "sparkles",
-                            title: "Sonnet",
+                            title: "Weekly — Sonnet",
                             percentage: usage.dailySonnet.percent,
-                            detail: usage.dailySonnet.timeRemainingString,
-                            compact: true
+                            detail: usage.dailySonnet.timeRemainingString
                         )
                     }
                 }
@@ -249,6 +271,12 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
+    }
+    
+    // MARK: - Helpers
+    
+    private var hasVisibleClaudeMetrics: Bool {
+        settings.isVisible(.claude5Hour) || settings.isVisible(.claudeWeeklyAll) || settings.isVisible(.claudeWeeklySonnet)
     }
     
     // MARK: - Inline Error

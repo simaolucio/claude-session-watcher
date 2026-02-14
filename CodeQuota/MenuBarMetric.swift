@@ -36,10 +36,18 @@ class MenuBarSettings: ObservableObject {
     static let shared = MenuBarSettings()
     
     private static let key = "menubar_selected_metric"
+    private static let hiddenKey = "hidden_metrics"
     
     @Published var selectedMetric: MenuBarMetric {
         didSet {
             UserDefaults.standard.set(selectedMetric.rawValue, forKey: Self.key)
+        }
+    }
+    
+    @Published var hiddenMetrics: Set<MenuBarMetric> {
+        didSet {
+            let rawValues = hiddenMetrics.map { $0.rawValue }
+            UserDefaults.standard.set(rawValues, forKey: Self.hiddenKey)
         }
     }
     
@@ -49,6 +57,26 @@ class MenuBarSettings: ObservableObject {
             selectedMetric = metric
         } else {
             selectedMetric = .claude5Hour
+        }
+        
+        if let rawValues = UserDefaults.standard.stringArray(forKey: Self.hiddenKey) {
+            hiddenMetrics = Set(rawValues.compactMap { MenuBarMetric(rawValue: $0) })
+        } else {
+            hiddenMetrics = []
+        }
+    }
+    
+    func isVisible(_ metric: MenuBarMetric) -> Bool {
+        !hiddenMetrics.contains(metric)
+    }
+    
+    func toggleVisibility(_ metric: MenuBarMetric) {
+        if hiddenMetrics.contains(metric) {
+            hiddenMetrics.remove(metric)
+        } else {
+            // Don't allow hiding the selected menu bar metric
+            if metric == selectedMetric { return }
+            hiddenMetrics.insert(metric)
         }
     }
 }

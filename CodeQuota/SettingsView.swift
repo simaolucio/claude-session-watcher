@@ -85,70 +85,86 @@ struct SettingsView: View {
     
     private var metricPickerSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Menu Bar Metric")
+            Text("Metrics")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.secondary.opacity(0.6))
             
-            Text("Choose which metric to display in the menu bar.")
+            Text("Tap to set the menu bar metric. Use the eye to show or hide in the main view.")
                 .font(.system(size: 11))
                 .foregroundColor(.secondary.opacity(0.35))
             
             VStack(spacing: 4) {
                 ForEach(availableMetrics, id: \.self) { metric in
                     let isSelected = menuBarSettings.selectedMetric == metric
+                    let isVisible = menuBarSettings.isVisible(metric)
                     
-                    Button(action: { menuBarSettings.selectedMetric = metric }) {
-                        HStack(spacing: 10) {
-                            // Accent bar on left edge for selected
-                            RoundedRectangle(cornerRadius: 1)
-                                .fill(isSelected ? Color.accentColor : Color.clear)
-                                .frame(width: 2, height: 14)
-                            
-                            Text(metric.displayName)
-                                .font(.system(size: 11, weight: isSelected ? .medium : .regular))
-                                .foregroundColor(isSelected ? .primary : .secondary.opacity(0.6))
-                            
-                            Spacer()
-                            
-                            if isSelected {
-                                Image(systemName: "checkmark")
-                                    .font(.system(size: 9, weight: .semibold))
-                                    .foregroundColor(.accentColor)
+                    HStack(spacing: 0) {
+                        // Main tappable area — selects menu bar metric
+                        Button(action: { menuBarSettings.selectedMetric = metric }) {
+                            HStack(spacing: 10) {
+                                RoundedRectangle(cornerRadius: 1)
+                                    .fill(isSelected ? Color.accentColor : Color.clear)
+                                    .frame(width: 2, height: 14)
+                                
+                                Text(metric.displayName)
+                                    .font(.system(size: 11, weight: isSelected ? .medium : .regular))
+                                    .foregroundColor(
+                                        !isVisible ? .secondary.opacity(0.3) :
+                                        isSelected ? .primary : .secondary.opacity(0.6)
+                                    )
+                                
+                                Spacer()
+                                
+                                if isSelected {
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 9, weight: .semibold))
+                                        .foregroundColor(.accentColor)
+                                }
                             }
                         }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(
-                                    isSelected
-                                        ? LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Color.accentColor.opacity(0.08),
-                                                Color.accentColor.opacity(0.02)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                        : LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Color.primary.opacity(0.03),
-                                                Color.primary.opacity(0.01)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                )
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(
-                                    isSelected ? Color.accentColor.opacity(0.15) : Color.primary.opacity(0.04),
-                                    lineWidth: 0.5
-                                )
-                        )
+                        .buttonStyle(PlainButtonStyle())
+                        
+                        // Visibility toggle
+                        Button(action: { menuBarSettings.toggleVisibility(metric) }) {
+                            Image(systemName: isVisible ? "eye" : "eye.slash")
+                                .font(.system(size: 10))
+                                .foregroundColor(isVisible ? .secondary.opacity(0.3) : .secondary.opacity(0.15))
+                                .frame(width: 28, height: 28)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .padding(.vertical, 4)
+                    .padding(.leading, 10)
+                    .padding(.trailing, 4)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(
+                                isSelected
+                                    ? LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.accentColor.opacity(0.08),
+                                            Color.accentColor.opacity(0.02)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                    : LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.primary.opacity(0.03),
+                                            Color.primary.opacity(0.01)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                            )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(
+                                isSelected ? Color.accentColor.opacity(0.15) : Color.primary.opacity(0.04),
+                                lineWidth: 0.5
+                            )
+                    )
                 }
             }
         }
