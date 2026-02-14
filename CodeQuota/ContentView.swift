@@ -20,6 +20,8 @@ struct ContentView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .background(Color(nsColor: NSColor(white: 0.12, alpha: 1.0)))
+        .environment(\.colorScheme, .dark)
         .onAppear {
             claudeUsage.startAutoRefresh()
             copilotUsage.startAutoRefresh()
