@@ -5,7 +5,7 @@ class GitHubAuthManager: ObservableObject {
     
     // GitHub CLI OAuth App — public, same as `gh` CLI
     private static let clientID = "178c6fc778ccc68e1d6a"
-    private static let scopes = "read:user user:email"
+    private static let scopes = "user"
     private static let credentialsKey = "github_oauth_credentials"
     private static let usernameKey = "github_username"
     

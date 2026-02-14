@@ -157,35 +157,40 @@ class CopilotUsageManager: ObservableObject {
             print("[Copilot] parse keys: \(json.keys.sorted())")
             
             var totalUsed = 0
+            var totalDiscount = 0
             var byModel: [(String, Int)] = []
             
-            if let items = json["usageItems"] as? [[String: Any]] {
-                for item in items {
-                    let model = item["model"] as? String ?? "Unknown"
-                    let qty = (item["grossQuantity"] as? Int)
-                        ?? (item["netQuantity"] as? Int)
-                        ?? Int(item["grossQuantity"] as? Double ?? 0)
-                    totalUsed += qty
-                    if qty > 0 {
-                        byModel.append((model, qty))
-                    }
-                }
-            } else if let items = json["usage_items"] as? [[String: Any]] {
-                for item in items {
-                    let model = item["model"] as? String ?? "Unknown"
-                    let qty = (item["gross_quantity"] as? Int)
-                        ?? (item["net_quantity"] as? Int)
-                        ?? Int(item["gross_quantity"] as? Double ?? 0)
-                    totalUsed += qty
-                    if qty > 0 {
-                        byModel.append((model, qty))
-                    }
+            let items = (json["usageItems"] as? [[String: Any]])
+                ?? (json["usage_items"] as? [[String: Any]])
+                ?? []
+            
+            for item in items {
+                let model = item["model"] as? String
+                    ?? item["model"] as? String
+                    ?? "Unknown"
+                
+                // grossQuantity comes as Double from the API (e.g. 1494.0)
+                let gross = intFromAny(item["grossQuantity"] ?? item["gross_quantity"])
+                let discount = intFromAny(item["discountQuantity"] ?? item["discount_quantity"])
+                
+                totalUsed += gross
+                totalDiscount += discount
+                if gross > 0 {
+                    byModel.append((model, gross))
                 }
             }
             
-            // Try to determine plan limit
-            // Default to Copilot Pro (300)
-            let limit = 300
+            // Infer plan limit from discount quantity (discount = included allowance)
+            // Fall back to common plan limits
+            let limit: Int
+            if totalDiscount > 0 {
+                // The discount represents the plan's included allowance
+                // Round up to the nearest known plan tier
+                limit = inferPlanLimit(fromDiscount: totalDiscount)
+            } else {
+                limit = 300 // Default Copilot Pro
+            }
+            
             let percent = limit > 0 ? min(Double(totalUsed) / Double(limit) * 100, 100) : 0
             
             byModel.sort { $0.1 > $1.1 }
@@ -206,6 +211,26 @@ class CopilotUsageManager: ObservableObject {
         } catch {
             state = .error("Parse error: \(error.localizedDescription)")
         }
+    }
+    
+    /// Extract an Int from a JSON value that may be Int or Double
+    private func intFromAny(_ value: Any?) -> Int {
+        if let i = value as? Int { return i }
+        if let d = value as? Double { return Int(d) }
+        if let s = value as? String, let i = Int(s) { return i }
+        return 0
+    }
+    
+    /// Infer the plan limit from the total discount (included allowance)
+    private func inferPlanLimit(fromDiscount discount: Int) -> Int {
+        // Known plan tiers
+        let tiers = [50, 300, 1500]
+        // Find the smallest tier >= discount, or use the discount itself
+        for tier in tiers {
+            if discount <= tier { return tier }
+        }
+        // If discount exceeds all known tiers, use it directly
+        return discount
     }
     
     private func updateLastUpdateText() {
