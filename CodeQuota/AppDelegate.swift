@@ -56,8 +56,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         
+        // Use hudWindow material — darker and more opaque than .popover,
+        // ensures text remains readable on bright desktop backgrounds
         let visualEffect = NSVisualEffectView()
-        visualEffect.material = .popover
+        visualEffect.material = .hudWindow
         visualEffect.blendingMode = .behindWindow
         visualEffect.state = .active
         visualEffect.translatesAutoresizingMaskIntoConstraints = false
