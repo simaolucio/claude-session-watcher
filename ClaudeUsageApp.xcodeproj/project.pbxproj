@@ -14,6 +14,9 @@
 		AA0000090000000000000001 /* ClaudeUsageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000100000000000000001 /* ClaudeUsageManager.swift */; };
 		BB0000010000000000000001 /* AnthropicAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000020000000000000001 /* AnthropicAuthManager.swift */; };
 		BB0000030000000000000001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000040000000000000001 /* SettingsView.swift */; };
+		CC0000010000000000000001 /* GitHubAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000020000000000000001 /* GitHubAuthManager.swift */; };
+		CC0000030000000000000001 /* CopilotUsageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000040000000000000001 /* CopilotUsageManager.swift */; };
+		CC0000050000000000000001 /* MenuBarMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000060000000000000001 /* MenuBarMetric.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +29,9 @@
 		AA0000120000000000000001 /* ClaudeUsageApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClaudeUsageApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0000020000000000000001 /* AnthropicAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicAuthManager.swift; sourceTree = "<group>"; };
 		BB0000040000000000000001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CC0000020000000000000001 /* GitHubAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAuthManager.swift; sourceTree = "<group>"; };
+		CC0000040000000000000001 /* CopilotUsageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopilotUsageManager.swift; sourceTree = "<group>"; };
+		CC0000060000000000000001 /* MenuBarMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarMetric.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +63,9 @@
 				AA0000100000000000000001 /* ClaudeUsageManager.swift */,
 				BB0000020000000000000001 /* AnthropicAuthManager.swift */,
 				BB0000040000000000000001 /* SettingsView.swift */,
+				CC0000020000000000000001 /* GitHubAuthManager.swift */,
+				CC0000040000000000000001 /* CopilotUsageManager.swift */,
+				CC0000060000000000000001 /* MenuBarMetric.swift */,
 				AA0000110000000000000001 /* Info.plist */,
 			);
 			path = ClaudeUsageApp;
@@ -145,6 +154,9 @@
 				AA0000090000000000000001 /* ClaudeUsageManager.swift in Sources */,
 				BB0000010000000000000001 /* AnthropicAuthManager.swift in Sources */,
 				BB0000030000000000000001 /* SettingsView.swift in Sources */,
+				CC0000010000000000000001 /* GitHubAuthManager.swift in Sources */,
+				CC0000030000000000000001 /* CopilotUsageManager.swift in Sources */,
+				CC0000050000000000000001 /* MenuBarMetric.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

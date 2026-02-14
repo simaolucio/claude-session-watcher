@@ -1,58 +1,62 @@
 import SwiftUI
 
 struct UsageIconView: View {
-    @StateObject private var usageManager = ClaudeUsageManager.shared
-    @StateObject private var authManager = AnthropicAuthManager.shared
+    @StateObject private var claudeUsage = ClaudeUsageManager.shared
+    @StateObject private var copilotUsage = CopilotUsageManager.shared
+    @StateObject private var anthropicAuth = AnthropicAuthManager.shared
+    @StateObject private var githubAuth = GitHubAuthManager.shared
+    @StateObject private var settings = MenuBarSettings.shared
     
     var body: some View {
-        Group {
-            if authManager.isConnected, case .loaded(let usage) = usageManager.state {
-                connectedView(usage)
-            } else if authManager.isConnected {
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(Color.secondary)
-                        .frame(width: 8, height: 8)
-                    Text("...")
-                        .font(.system(size: 12))
+        HStack(spacing: 4) {
+            let (pct, time) = resolveMetric()
+            
+            Circle()
+                .fill(pct != nil ? color(for: pct!) : Color.secondary.opacity(0.4))
+                .frame(width: 8, height: 8)
+            
+            if let pct = pct {
+                Text(String(format: "%.0f%%", pct))
+                    .font(.system(size: 12, weight: .medium))
+                
+                if let time = time {
+                    Text(time)
+                        .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 }
             } else {
-                HStack(spacing: 4) {
-                    Circle()
-                        .strokeBorder(Color.secondary, lineWidth: 1)
-                        .frame(width: 8, height: 8)
-                    Text("--")
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-                }
+                Text("--")
+                    .font(.system(size: 12))
+                    .foregroundColor(.secondary)
             }
         }
         .padding(.horizontal, 4)
     }
     
-    private func connectedView(_ usage: ClaudeUsage) -> some View {
-        HStack(spacing: 4) {
-            Circle()
-                .fill(color(for: usage.fiveHour.percent))
-                .frame(width: 8, height: 8)
+    /// Returns (percent, timeRemaining) for the currently selected metric
+    private func resolveMetric() -> (Double?, String?) {
+        switch settings.selectedMetric {
+        case .claude5Hour:
+            guard anthropicAuth.isConnected, case .loaded(let u) = claudeUsage.state else { return (nil, nil) }
+            return (u.fiveHour.percent, u.fiveHour.timeRemainingString)
             
-            Text(String(format: "%.0f%%", usage.fiveHour.percent))
-                .font(.system(size: 12, weight: .medium))
+        case .claudeWeeklyAll:
+            guard anthropicAuth.isConnected, case .loaded(let u) = claudeUsage.state else { return (nil, nil) }
+            return (u.dailyAllModels.percent, u.dailyAllModels.timeRemainingString)
             
-            Text(usage.fiveHour.timeRemainingString)
-                .font(.system(size: 11))
-                .foregroundColor(.secondary)
+        case .claudeWeeklySonnet:
+            guard anthropicAuth.isConnected, case .loaded(let u) = claudeUsage.state else { return (nil, nil) }
+            return (u.dailySonnet.percent, u.dailySonnet.timeRemainingString)
+            
+        case .copilotPremium:
+            guard githubAuth.isConnected, case .loaded(let u) = copilotUsage.state else { return (nil, nil) }
+            return (u.percent, nil)
         }
     }
     
     private func color(for percentage: Double) -> Color {
-        if percentage < 50 {
-            return .green
-        } else if percentage < 80 {
-            return .yellow
-        } else {
-            return .red
-        }
+        if percentage < 50 { return .green }
+        else if percentage < 80 { return .yellow }
+        else { return .red }
     }
 }

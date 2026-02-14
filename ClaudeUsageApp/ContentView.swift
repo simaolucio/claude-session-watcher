@@ -1,8 +1,10 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var usageManager = ClaudeUsageManager.shared
-    @StateObject private var authManager = AnthropicAuthManager.shared
+    @StateObject private var claudeUsage = ClaudeUsageManager.shared
+    @StateObject private var copilotUsage = CopilotUsageManager.shared
+    @StateObject private var anthropicAuth = AnthropicAuthManager.shared
+    @StateObject private var githubAuth = GitHubAuthManager.shared
     @State private var isRefreshing = false
     @State private var showSettings = false
     
@@ -14,178 +16,200 @@ struct ContentView: View {
                 mainView
             }
         }
-        .frame(width: 400, height: 500)
+        .frame(width: 400, height: 540)
         .onAppear {
-            usageManager.startAutoRefresh()
+            claudeUsage.startAutoRefresh()
+            copilotUsage.startAutoRefresh()
         }
     }
     
-    // MARK: - Main Usage View
+    // MARK: - Main View
     
     private var mainView: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Header
-            HStack {
-                Text("Claude Usage")
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                // Header
+                Text("Usage Monitor")
                     .font(.system(size: 20, weight: .semibold))
+                    .padding(.horizontal, 24)
+                    .padding(.top, 24)
+                    .padding(.bottom, 20)
                 
-                Spacer()
+                // Claude section
+                if anthropicAuth.isConnected {
+                    claudeSection
+                }
                 
-                // intentionally empty — header right side reserved
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 24)
-            .padding(.bottom, 20)
-            
-            // Content based on state
-            switch usageManager.state {
-            case .notConnected:
-                notConnectedView
-            case .loading:
-                loadingView
-            case .loaded(let usage):
-                usageView(usage)
-            case .error(let message):
-                errorView(message)
-            }
-            
-            Spacer()
-            
-            // Divider
-            Divider()
-                .opacity(0.3)
+                // Copilot section
+                if githubAuth.isConnected {
+                    copilotSection
+                }
+                
+                // Not connected prompt
+                if !anthropicAuth.isConnected && !githubAuth.isConnected {
+                    notConnectedView
+                }
+                
+                Spacer(minLength: 16)
+                
+                // Divider
+                Divider()
+                    .opacity(0.3)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 12)
+                
+                // Bottom actions
+                HStack(spacing: 20) {
+                    Spacer()
+                    
+                    Button(action: { showSettings = true }) {
+                        Text("Settings")
+                            .font(.system(size: 13))
+                            .foregroundColor(.accentColor)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Button(action: {
+                        NSApplication.shared.terminate(nil)
+                    }) {
+                        Text("Quit")
+                            .font(.system(size: 13))
+                            .foregroundColor(.accentColor)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
                 .padding(.horizontal, 24)
-                .padding(.bottom, 12)
-            
-            // Bottom actions
-            HStack(spacing: 20) {
-                Spacer()
-                
-                Button(action: { showSettings = true }) {
-                    Text("Settings")
-                        .font(.system(size: 13))
-                        .foregroundColor(.accentColor)
-                }
-                .buttonStyle(PlainButtonStyle())
-                
-                Button(action: {
-                    NSApplication.shared.terminate(nil)
-                }) {
-                    Text("Quit")
-                        .font(.system(size: 13))
-                        .foregroundColor(.accentColor)
-                }
-                .buttonStyle(PlainButtonStyle())
+                .padding(.bottom, 16)
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 16)
         }
     }
     
-    // MARK: - Not Connected View
+    // MARK: - Claude Section
     
-    private var notConnectedView: some View {
-        VStack(spacing: 16) {
+    private var claudeSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionHeader("Claude", updated: claudeUsage.lastUpdateText) {
+                refreshClaude()
+            }
+            
+            switch claudeUsage.state {
+            case .notConnected:
+                EmptyView()
+            case .loading:
+                HStack { Spacer(); ProgressView().controlSize(.small); Spacer() }
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 24)
+            case .loaded(let usage):
+                usageBucketView(icon: "clock.fill", title: "5-Hour Session", bucket: usage.fiveHour)
+                    .padding(.horizontal, 24).padding(.bottom, 16)
+                usageBucketView(icon: "calendar", title: "Weekly — All Models", bucket: usage.dailyAllModels)
+                    .padding(.horizontal, 24).padding(.bottom, 16)
+                usageBucketView(icon: "sparkles", title: "Weekly — Sonnet", bucket: usage.dailySonnet)
+                    .padding(.horizontal, 24).padding(.bottom, 16)
+            case .error(let msg):
+                inlineError(msg) { refreshClaude() }
+                    .padding(.horizontal, 24).padding(.bottom, 16)
+            }
+            
+            Divider().opacity(0.15).padding(.horizontal, 24).padding(.bottom, 16)
+        }
+    }
+    
+    // MARK: - Copilot Section
+    
+    private var copilotSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionHeader("Copilot", updated: copilotUsage.lastUpdateText) {
+                refreshCopilot()
+            }
+            
+            switch copilotUsage.state {
+            case .notConnected:
+                EmptyView()
+            case .loading:
+                HStack { Spacer(); ProgressView().controlSize(.small); Spacer() }
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 24)
+            case .loaded(let usage):
+                copilotUsageView(usage)
+                    .padding(.horizontal, 24).padding(.bottom, 16)
+            case .error(let msg):
+                inlineError(msg) { refreshCopilot() }
+                    .padding(.horizontal, 24).padding(.bottom, 16)
+            }
+        }
+    }
+    
+    // MARK: - Section Header
+    
+    private func sectionHeader(_ title: String, updated: String, refresh: @escaping () -> Void) -> some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 16, weight: .semibold))
+            
             Spacer()
             
-            Image(systemName: "link.badge.plus")
-                .font(.system(size: 36))
+            Text(updated)
+                .font(.system(size: 11))
                 .foregroundColor(.secondary.opacity(0.5))
             
-            Text("Connect your Anthropic account to view usage")
-                .font(.system(size: 14))
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-            
-            Button(action: { showSettings = true }) {
-                HStack {
-                    Image(systemName: "link")
-                        .font(.system(size: 13))
-                    Text("Connect to Anthropic")
-                        .font(.system(size: 14, weight: .medium))
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 8)
-                .background(Color.accentColor.opacity(0.15))
-                .foregroundColor(.accentColor)
-                .cornerRadius(8)
+            Button(action: refresh) {
+                Image(systemName: "arrow.clockwise")
+                    .foregroundColor(.secondary.opacity(0.6))
+                    .font(.system(size: 12))
             }
             .buttonStyle(PlainButtonStyle())
-            
-            Spacer()
         }
-        .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
+        .padding(.bottom, 14)
     }
     
-    // MARK: - Loading View
+    // MARK: - Copilot Usage View
     
-    private var loadingView: some View {
-        VStack(spacing: 16) {
-            Spacer()
-            ProgressView()
-                .controlSize(.large)
-            Text("Loading usage data...")
-                .font(.system(size: 13))
-                .foregroundColor(.secondary)
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 24)
-    }
-    
-    // MARK: - Usage View
-    
-    private func usageView(_ usage: ClaudeUsage) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // 5-Hour Session
-            usageBucketView(
-                icon: "clock.fill",
-                title: "5-Hour Session",
-                bucket: usage.fiveHour
-            )
-            .padding(.horizontal, 24)
-            .padding(.bottom, 24)
-            
-            // Weekly — All Models
-            usageBucketView(
-                icon: "calendar",
-                title: "Weekly — All Models",
-                bucket: usage.dailyAllModels
-            )
-            .padding(.horizontal, 24)
-            .padding(.bottom, 24)
-            
-            // Weekly — Sonnet
-            usageBucketView(
-                icon: "sparkles",
-                title: "Weekly — Sonnet",
-                bucket: usage.dailySonnet
-            )
-            .padding(.horizontal, 24)
-            .padding(.bottom, 16)
-            
-            // Update info and refresh
-            HStack {
-                Text("Updated \(usageManager.lastUpdateText)")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary.opacity(0.6))
+    private func copilotUsageView(_ usage: CopilotUsage) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: "cpu")
+                    .foregroundColor(color(for: usage.percent))
+                    .font(.system(size: 16))
+                
+                Text("Premium Requests")
+                    .font(.system(size: 15, weight: .semibold))
                 
                 Spacer()
                 
-                Button(action: { refresh() }) {
-                    Image(systemName: "arrow.clockwise")
-                        .foregroundColor(.secondary.opacity(0.7))
-                        .font(.system(size: 14))
-                        .rotationEffect(.degrees(isRefreshing ? 360 : 0))
-                }
-                .buttonStyle(PlainButtonStyle())
+                Text("\(usage.premiumRequestsUsed)/\(usage.premiumRequestsLimit)")
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .foregroundColor(color(for: usage.percent))
             }
-            .padding(.horizontal, 24)
+            
+            ProgressBar(percentage: usage.percent)
+            
+            Text("This month")
+                .font(.system(size: 12))
+                .foregroundColor(.secondary.opacity(0.6))
+            
+            // Model breakdown
+            if !usage.byModel.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(usage.byModel.prefix(5), id: \.model) { item in
+                        HStack {
+                            Text(item.model)
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text("\(item.count)")
+                                .font(.system(size: 11, design: .monospaced))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding(.top, 4)
+            }
         }
     }
     
-    // MARK: - Usage Bucket Row
+    // MARK: - Usage Bucket Row (Claude)
     
     private func usageBucketView(icon: String, title: String, bucket: UsageBucket) -> some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -214,58 +238,70 @@ struct ContentView: View {
         }
     }
     
-    // MARK: - Error View
+    // MARK: - Not Connected View
     
-    private func errorView(_ message: String) -> some View {
+    private var notConnectedView: some View {
         VStack(spacing: 16) {
-            Spacer()
+            Spacer(minLength: 40)
             
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 32))
-                .foregroundColor(.orange)
+            Image(systemName: "link.badge.plus")
+                .font(.system(size: 36))
+                .foregroundColor(.secondary.opacity(0.5))
             
-            Text(message)
-                .font(.system(size: 13))
+            Text("Connect an account to view usage")
+                .font(.system(size: 14))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
-            Button(action: { refresh() }) {
-                Text("Retry")
+            Button(action: { showSettings = true }) {
+                Text("Open Settings")
                     .font(.system(size: 14, weight: .medium))
                     .padding(.horizontal, 20)
-                    .padding(.vertical, 6)
+                    .padding(.vertical, 8)
                     .background(Color.accentColor.opacity(0.15))
                     .foregroundColor(.accentColor)
-                    .cornerRadius(6)
+                    .cornerRadius(8)
             }
             .buttonStyle(PlainButtonStyle())
             
-            Spacer()
+            Spacer(minLength: 40)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
     }
     
-    // MARK: - Helpers
+    // MARK: - Inline Error
     
-    private func refresh() {
-        withAnimation(.linear(duration: 0.8)) {
-            isRefreshing = true
-        }
-        usageManager.refresh()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            isRefreshing = false
+    private func inlineError(_ message: String, retry: @escaping () -> Void) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle")
+                .foregroundColor(.orange)
+                .font(.system(size: 14))
+            Text(message)
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+                .lineLimit(2)
+            Spacer()
+            Button("Retry", action: retry)
+                .font(.system(size: 12))
+                .buttonStyle(.borderless)
         }
     }
     
+    // MARK: - Helpers
+    
+    private func refreshClaude() {
+        claudeUsage.refresh()
+    }
+    
+    private func refreshCopilot() {
+        copilotUsage.refresh()
+    }
+    
     private func color(for percentage: Double) -> Color {
-        if percentage < 50 {
-            return .green
-        } else if percentage < 80 {
-            return .yellow
-        } else {
-            return .red
-        }
+        if percentage < 50 { return .green }
+        else if percentage < 80 { return .yellow }
+        else { return .red }
     }
 }
 
@@ -277,12 +313,9 @@ struct ProgressBar: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
-                // Background track
                 RoundedRectangle(cornerRadius: 4)
                     .fill(.primary.opacity(0.1))
                     .frame(height: 6)
-                
-                // Fill
                 RoundedRectangle(cornerRadius: 4)
                     .fill(color(for: percentage))
                     .frame(width: max(0, geometry.size.width * CGFloat(percentage / 100)), height: 6)
@@ -292,12 +325,8 @@ struct ProgressBar: View {
     }
     
     private func color(for percentage: Double) -> Color {
-        if percentage < 50 {
-            return .green
-        } else if percentage < 80 {
-            return .yellow
-        } else {
-            return .red
-        }
+        if percentage < 50 { return .green }
+        else if percentage < 80 { return .yellow }
+        else { return .red }
     }
 }
