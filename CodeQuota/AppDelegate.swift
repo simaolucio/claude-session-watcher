@@ -20,17 +20,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.target = self
         }
         
-        // Create popover with transparent/vibrancy content
         popover = NSPopover()
-        popover.contentSize = NSSize(width: 400, height: 540)
+        popover.contentSize = NSSize(width: 400, height: 10)
         popover.behavior = .transient
         
         let contentView = ContentView()
+            .environment(\.colorScheme, .dark)
         let hostingController = NSHostingController(rootView: contentView)
-        
-        // Make the hosting view's layer transparent so the vibrancy shows through
-        hostingController.view.wantsLayer = true
-        hostingController.view.layer?.backgroundColor = NSColor.clear.cgColor
         
         popover.contentViewController = hostingController
     }
@@ -41,36 +37,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 popover.performClose(nil)
             } else {
                 popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-                
-                // Apply vibrancy to the popover's content view after it's shown
-                if let contentView = popover.contentViewController?.view {
-                    applyVibrancy(to: contentView)
-                }
             }
         }
-    }
-    
-    private func applyVibrancy(to view: NSView) {
-        // Check if we already added a visual effect view
-        if view.subviews.first(where: { $0 is NSVisualEffectView }) != nil {
-            return
-        }
-        
-        let visualEffect = NSVisualEffectView()
-        visualEffect.material = .popover
-        visualEffect.blendingMode = .behindWindow
-        visualEffect.state = .active
-        visualEffect.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Insert the visual effect view behind all other content
-        view.addSubview(visualEffect, positioned: .below, relativeTo: view.subviews.first)
-        
-        NSLayoutConstraint.activate([
-            visualEffect.topAnchor.constraint(equalTo: view.topAnchor),
-            visualEffect.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            visualEffect.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            visualEffect.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        ])
     }
 }
 
