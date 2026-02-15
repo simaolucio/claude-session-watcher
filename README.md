@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="assets/banner.svg" alt="CodeQuota — Claude & Copilot usage tracking for macOS" width="800">
+  <img src="assets/banner.png" alt="CodeQuota — Claude & Copilot usage tracking for macOS" width="800">
 </p>
 
 <p align="center">
