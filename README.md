@@ -15,7 +15,6 @@
   <img src="https://img.shields.io/badge/platform-macOS_13%2B-blue" alt="Platform">
   <img src="https://img.shields.io/badge/swift-5.9-F05138?logo=swift&logoColor=white" alt="Swift">
   <a href="https://github.com/simaolucio/CodeQuota/blob/main/LICENSE"><img src="https://img.shields.io/github/license/simaolucio/CodeQuota" alt="License"></a>
-  <a href="https://github.com/simaolucio/CodeQuota/stargazers"><img src="https://img.shields.io/github/stars/simaolucio/CodeQuota?style=flat" alt="Stars"></a>
   <a href="https://ko-fi.com/P5P31U8CJQ"><img src="https://badgen.net/badge/Ko-fi/Buy%20me%20a%20coffee/FF5E5B?icon=kofi" alt="Ko-fi"></a>
 </p>
 
@@ -187,14 +186,4 @@ Check the [open issues](https://github.com/simaolucio/CodeQuota/issues) for idea
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
----
 
-<p align="center">
-  <a href="https://star-history.com/#simaolucio/CodeQuota&Date">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=simaolucio/CodeQuota&type=Date&theme=dark" />
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=simaolucio/CodeQuota&type=Date" />
-      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=simaolucio/CodeQuota&type=Date" width="600" />
-    </picture>
-  </a>
-</p>
