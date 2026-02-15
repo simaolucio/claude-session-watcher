@@ -26,14 +26,23 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
+      - name: Install create-dmg
+        run: brew install create-dmg
+
       - name: Create DMG
         run: |
-          hdiutil create \
-            -volname "CodeQuota" \
-            -srcfolder build/Build/Products/Release/CodeQuota.app \
-            -ov \
-            -format UDZO \
-            "CodeQuota-${{ github.ref_name }}.dmg"
+          create-dmg \
+            --volname "CodeQuota" \
+            --volicon "CodeQuota/Assets.xcassets/AppIcon.appiconset/AppIcon.png" \
+            --window-pos 200 120 \
+            --window-size 660 400 \
+            --icon-size 160 \
+            --icon "CodeQuota.app" 180 170 \
+            --hide-extension "CodeQuota.app" \
+            --app-drop-link 480 170 \
+            --no-internet-enable \
+            "CodeQuota-${{ github.ref_name }}.dmg" \
+            "build/Build/Products/Release/CodeQuota.app"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
