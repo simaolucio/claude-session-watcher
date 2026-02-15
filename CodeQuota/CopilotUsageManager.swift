@@ -148,89 +148,16 @@ class CopilotUsageManager: ObservableObject {
     }
     
     private func parseUsageResponse(_ data: Data) {
-        do {
-            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                state = .error("Invalid response format.")
-                return
-            }
-            
-            print("[Copilot] parse keys: \(json.keys.sorted())")
-            
-            var totalUsed = 0
-            var totalDiscount = 0
-            var byModel: [(String, Int)] = []
-            
-            let items = (json["usageItems"] as? [[String: Any]])
-                ?? (json["usage_items"] as? [[String: Any]])
-                ?? []
-            
-            for item in items {
-                let model = item["model"] as? String
-                    ?? item["model"] as? String
-                    ?? "Unknown"
-                
-                // grossQuantity comes as Double from the API (e.g. 1494.0)
-                let gross = intFromAny(item["grossQuantity"] ?? item["gross_quantity"])
-                let discount = intFromAny(item["discountQuantity"] ?? item["discount_quantity"])
-                
-                totalUsed += gross
-                totalDiscount += discount
-                if gross > 0 {
-                    byModel.append((model, gross))
-                }
-            }
-            
-            // Infer plan limit from discount quantity (discount = included allowance)
-            // Fall back to common plan limits
-            let limit: Int
-            if totalDiscount > 0 {
-                // The discount represents the plan's included allowance
-                // Round up to the nearest known plan tier
-                limit = inferPlanLimit(fromDiscount: totalDiscount)
-            } else {
-                limit = 300 // Default Copilot Pro
-            }
-            
-            let percent = limit > 0 ? min(Double(totalUsed) / Double(limit) * 100, 100) : 0
-            
-            byModel.sort { $0.1 > $1.1 }
-            
-            let usage = CopilotUsage(
-                premiumRequestsUsed: totalUsed,
-                premiumRequestsLimit: limit,
-                percent: percent,
-                byModel: byModel
-            )
-            
-            print("[Copilot] parsed: used=\(totalUsed)/\(limit) (\(String(format: "%.0f", percent))%) models=\(byModel.count)")
-            
+        let result = CopilotUsageParser.parseResponse(data)
+        switch result {
+        case .success(let usage):
+            print("[Copilot] parsed: used=\(usage.premiumRequestsUsed)/\(usage.premiumRequestsLimit) (\(String(format: "%.0f", usage.percent))%) models=\(usage.byModel.count)")
             state = .loaded(usage)
             lastUpdateTime = Date()
             lastUpdateText = "just now"
-            
-        } catch {
-            state = .error("Parse error: \(error.localizedDescription)")
+        case .failure:
+            state = .error("Invalid response format.")
         }
-    }
-    
-    /// Extract an Int from a JSON value that may be Int or Double
-    private func intFromAny(_ value: Any?) -> Int {
-        if let i = value as? Int { return i }
-        if let d = value as? Double { return Int(d) }
-        if let s = value as? String, let i = Int(s) { return i }
-        return 0
-    }
-    
-    /// Infer the plan limit from the total discount (included allowance)
-    private func inferPlanLimit(fromDiscount discount: Int) -> Int {
-        // Known plan tiers
-        let tiers = [50, 300, 1500]
-        // Find the smallest tier >= discount, or use the discount itself
-        for tier in tiers {
-            if discount <= tier { return tier }
-        }
-        // If discount exceeds all known tiers, use it directly
-        return discount
     }
     
     private func updateLastUpdateText() {

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,11 +14,24 @@
 		AA0000090000000000000001 /* ClaudeUsageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000100000000000000001 /* ClaudeUsageManager.swift */; };
 		BB0000010000000000000001 /* AnthropicAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000020000000000000001 /* AnthropicAuthManager.swift */; };
 		BB0000030000000000000001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000040000000000000001 /* SettingsView.swift */; };
+		C3A6C1A32F427B6000C57C8F /* ClaudeUsageParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A6C1A02F427B6000C57C8F /* ClaudeUsageParser.swift */; };
+		C3A6C1A42F427B6000C57C8F /* CopilotUsageParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A6C1A12F427B6000C57C8F /* CopilotUsageParser.swift */; };
+		C3A6C1A52F427B6000C57C8F /* PKCEHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A6C1A22F427B6000C57C8F /* PKCEHelper.swift */; };
 		CC0000010000000000000001 /* GitHubAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000020000000000000001 /* GitHubAuthManager.swift */; };
 		CC0000030000000000000001 /* CopilotUsageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000040000000000000001 /* CopilotUsageManager.swift */; };
 		CC0000050000000000000001 /* MenuBarMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000060000000000000001 /* MenuBarMetric.swift */; };
 		DD0000010000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DD0000020000000000000001 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C3A6C1AE2F427BCA00C57C8F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA0000210000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA0000170000000000000001;
+			remoteInfo = CodeQuota;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		AA0000020000000000000001 /* CodeQuotaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeQuotaApp.swift; sourceTree = "<group>"; };
@@ -30,14 +43,29 @@
 		AA0000120000000000000001 /* CodeQuota.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodeQuota.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0000020000000000000001 /* AnthropicAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicAuthManager.swift; sourceTree = "<group>"; };
 		BB0000040000000000000001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		C3A6C1A02F427B6000C57C8F /* ClaudeUsageParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageParser.swift; sourceTree = "<group>"; };
+		C3A6C1A12F427B6000C57C8F /* CopilotUsageParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopilotUsageParser.swift; sourceTree = "<group>"; };
+		C3A6C1A22F427B6000C57C8F /* PKCEHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PKCEHelper.swift; sourceTree = "<group>"; };
+		C3A6C1AA2F427BCA00C57C8F /* CodeQuotaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodeQuotaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC0000020000000000000001 /* GitHubAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAuthManager.swift; sourceTree = "<group>"; };
 		CC0000040000000000000001 /* CopilotUsageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopilotUsageManager.swift; sourceTree = "<group>"; };
 		CC0000060000000000000001 /* MenuBarMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarMetric.swift; sourceTree = "<group>"; };
 		DD0000020000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		C3A6C1AB2F427BCA00C57C8F /* CodeQuotaTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CodeQuotaTests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		AA0000130000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3A6C1A72F427BCA00C57C8F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -50,15 +78,16 @@
 		AA0000140000000000000001 = {
 			isa = PBXGroup;
 			children = (
-			AA0000150000000000000001 /* CodeQuota */,
-			AA0000160000000000000001 /* Products */,
+				AA0000150000000000000001 /* CodeQuota */,
+				C3A6C1AB2F427BCA00C57C8F /* CodeQuotaTests */,
+				AA0000160000000000000001 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-	AA0000150000000000000001 /* CodeQuota */ = {
-		isa = PBXGroup;
-		children = (
-			AA0000020000000000000001 /* CodeQuotaApp.swift */,
+		AA0000150000000000000001 /* CodeQuota */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000020000000000000001 /* CodeQuotaApp.swift */,
 				AA0000040000000000000001 /* AppDelegate.swift */,
 				AA0000060000000000000001 /* ContentView.swift */,
 				AA0000080000000000000001 /* UsageIconView.swift */,
@@ -68,16 +97,20 @@
 				CC0000020000000000000001 /* GitHubAuthManager.swift */,
 				CC0000040000000000000001 /* CopilotUsageManager.swift */,
 				CC0000060000000000000001 /* MenuBarMetric.swift */,
+				C3A6C1A02F427B6000C57C8F /* ClaudeUsageParser.swift */,
+				C3A6C1A12F427B6000C57C8F /* CopilotUsageParser.swift */,
+				C3A6C1A22F427B6000C57C8F /* PKCEHelper.swift */,
 				DD0000020000000000000001 /* Assets.xcassets */,
 				AA0000110000000000000001 /* Info.plist */,
 			);
-		path = CodeQuota;
-		sourceTree = "<group>";
+			path = CodeQuota;
+			sourceTree = "<group>";
 		};
 		AA0000160000000000000001 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				AA0000120000000000000001 /* CodeQuota.app */,
+				C3A6C1AA2F427BCA00C57C8F /* CodeQuotaTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -85,9 +118,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-	AA0000170000000000000001 /* CodeQuota */ = {
-		isa = PBXNativeTarget;
-		buildConfigurationList = AA0000180000000000000001 /* Build configuration list for PBXNativeTarget "CodeQuota" */;
+		AA0000170000000000000001 /* CodeQuota */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0000180000000000000001 /* Build configuration list for PBXNativeTarget "CodeQuota" */;
 			buildPhases = (
 				AA0000190000000000000001 /* Sources */,
 				AA0000130000000000000001 /* Frameworks */,
@@ -97,10 +130,33 @@
 			);
 			dependencies = (
 			);
-		name = CodeQuota;
-		productName = CodeQuota;
-		productReference = AA0000120000000000000001 /* CodeQuota.app */;
+			name = CodeQuota;
+			productName = CodeQuota;
+			productReference = AA0000120000000000000001 /* CodeQuota.app */;
 			productType = "com.apple.product-type.application";
+		};
+		C3A6C1A92F427BCA00C57C8F /* CodeQuotaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C3A6C1B02F427BCA00C57C8F /* Build configuration list for PBXNativeTarget "CodeQuotaTests" */;
+			buildPhases = (
+				C3A6C1A62F427BCA00C57C8F /* Sources */,
+				C3A6C1A72F427BCA00C57C8F /* Frameworks */,
+				C3A6C1A82F427BCA00C57C8F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C3A6C1AF2F427BCA00C57C8F /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C3A6C1AB2F427BCA00C57C8F /* CodeQuotaTests */,
+			);
+			name = CodeQuotaTests;
+			packageProductDependencies = (
+			);
+			productName = CodeQuotaTests;
+			productReference = C3A6C1AA2F427BCA00C57C8F /* CodeQuotaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -109,11 +165,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					AA0000170000000000000001 = {
 						CreatedOnToolsVersion = 15.0;
+					};
+					C3A6C1A92F427BCA00C57C8F = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = AA0000170000000000000001;
 					};
 				};
 			};
@@ -130,8 +190,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-			AA0000170000000000000001 /* CodeQuota */,
-		);
+				AA0000170000000000000001 /* CodeQuota */,
+				C3A6C1A92F427BCA00C57C8F /* CodeQuotaTests */,
+			);
 		};
 /* End PBXProject section */
 
@@ -141,6 +202,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				DD0000010000000000000001 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3A6C1A82F427BCA00C57C8F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,13 +226,31 @@
 				AA0000090000000000000001 /* ClaudeUsageManager.swift in Sources */,
 				BB0000010000000000000001 /* AnthropicAuthManager.swift in Sources */,
 				BB0000030000000000000001 /* SettingsView.swift in Sources */,
+				C3A6C1A32F427B6000C57C8F /* ClaudeUsageParser.swift in Sources */,
+				C3A6C1A42F427B6000C57C8F /* CopilotUsageParser.swift in Sources */,
+				C3A6C1A52F427B6000C57C8F /* PKCEHelper.swift in Sources */,
 				CC0000010000000000000001 /* GitHubAuthManager.swift in Sources */,
 				CC0000030000000000000001 /* CopilotUsageManager.swift in Sources */,
 				CC0000050000000000000001 /* MenuBarMetric.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C3A6C1A62F427BCA00C57C8F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C3A6C1AF2F427BCA00C57C8F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA0000170000000000000001 /* CodeQuota */;
+			targetProxy = C3A6C1AE2F427BCA00C57C8F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AA0000230000000000000001 /* Debug */ = {
@@ -345,6 +431,48 @@
 			};
 			name = Release;
 		};
+		C3A6C1B12F427BCA00C57C8F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8X6D669JYS;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.simaolucio.CodeQuotaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodeQuota.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CodeQuota";
+			};
+			name = Debug;
+		};
+		C3A6C1B22F427BCA00C57C8F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8X6D669JYS;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.simaolucio.CodeQuotaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodeQuota.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CodeQuota";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -362,6 +490,15 @@
 			buildConfigurations = (
 				AA0000230000000000000001 /* Debug */,
 				AA0000240000000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C3A6C1B02F427BCA00C57C8F /* Build configuration list for PBXNativeTarget "CodeQuotaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3A6C1B12F427BCA00C57C8F /* Debug */,
+				C3A6C1B22F427BCA00C57C8F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

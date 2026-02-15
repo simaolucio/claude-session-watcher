@@ -227,7 +227,7 @@ struct SettingsView: View {
                 .buttonStyle(PlainButtonStyle())
             }
             
-            if let error = githubAuth.authError {
+            if githubAuth.authError != nil {
                 errorDot
             }
         }

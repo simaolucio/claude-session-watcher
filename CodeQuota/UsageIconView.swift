@@ -11,23 +11,28 @@ struct UsageIconView: View {
         HStack(spacing: 4) {
             let (pct, time) = resolveMetric()
             
-            Circle()
-                .fill(pct != nil ? color(for: pct!) : Color.secondary.opacity(0.4))
-                .frame(width: 8, height: 8)
-            
             if let pct = pct {
+                // Connected: colored dot + percentage + optional reset time
+                Circle()
+                    .fill(color(for: pct))
+                    .frame(width: 8, height: 8)
+                
                 Text(String(format: "%.0f%%", pct))
                     .font(.system(size: 12, weight: .medium))
                 
                 if settings.showResetTime, let time = time {
                     Text(time)
                         .font(.system(size: 11))
-                        .foregroundColor(.secondary)
                 }
             } else {
-                Text("--")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary)
+                // Disconnected: logo + "!"
+                Image("MenuBarIcon")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 16)
+                
+                Text("!")
+                    .font(.system(size: 14, weight: .bold))
             }
         }
         .padding(.horizontal, 4)
