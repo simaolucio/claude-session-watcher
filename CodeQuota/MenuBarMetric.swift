@@ -35,46 +35,54 @@ enum MenuBarMetric: String, CaseIterable, Codable {
 class MenuBarSettings: ObservableObject {
     static let shared = MenuBarSettings()
     
-    private static let key = "menubar_selected_metric"
-    private static let hiddenKey = "hidden_metrics"
-    private static let showResetTimeKey = "show_reset_time"
+    static let key = "menubar_selected_metric"
+    static let hiddenKey = "hidden_metrics"
+    static let showResetTimeKey = "show_reset_time"
+    
+    let defaults: UserDefaults
     
     @Published var showResetTime: Bool {
         didSet {
-            UserDefaults.standard.set(showResetTime, forKey: Self.showResetTimeKey)
+            defaults.set(showResetTime, forKey: Self.showResetTimeKey)
         }
     }
     
     @Published var selectedMetric: MenuBarMetric {
         didSet {
-            UserDefaults.standard.set(selectedMetric.rawValue, forKey: Self.key)
+            defaults.set(selectedMetric.rawValue, forKey: Self.key)
         }
     }
     
     @Published var hiddenMetrics: Set<MenuBarMetric> {
         didSet {
             let rawValues = hiddenMetrics.map { $0.rawValue }
-            UserDefaults.standard.set(rawValues, forKey: Self.hiddenKey)
+            defaults.set(rawValues, forKey: Self.hiddenKey)
         }
     }
     
-    private init() {
-        if let raw = UserDefaults.standard.string(forKey: Self.key),
+    private convenience init() {
+        self.init(defaults: .standard)
+    }
+    
+    init(defaults: UserDefaults) {
+        self.defaults = defaults
+        
+        if let raw = defaults.string(forKey: Self.key),
            let metric = MenuBarMetric(rawValue: raw) {
             selectedMetric = metric
         } else {
             selectedMetric = .claude5Hour
         }
         
-        if let rawValues = UserDefaults.standard.stringArray(forKey: Self.hiddenKey) {
+        if let rawValues = defaults.stringArray(forKey: Self.hiddenKey) {
             hiddenMetrics = Set(rawValues.compactMap { MenuBarMetric(rawValue: $0) })
         } else {
             hiddenMetrics = []
         }
         
         // Default to true if never set
-        if UserDefaults.standard.object(forKey: Self.showResetTimeKey) != nil {
-            showResetTime = UserDefaults.standard.bool(forKey: Self.showResetTimeKey)
+        if defaults.object(forKey: Self.showResetTimeKey) != nil {
+            showResetTime = defaults.bool(forKey: Self.showResetTimeKey)
         } else {
             showResetTime = true
         }

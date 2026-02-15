@@ -1,28 +1,4 @@
 import Foundation
-import CryptoKit
-import Security
-
-// MARK: - PKCE Helpers
-
-private func generateRandomBytes(_ count: Int) -> Data {
-    var bytes = [UInt8](repeating: 0, count: count)
-    _ = SecRandomCopyBytes(kSecRandomDefault, count, &bytes)
-    return Data(bytes)
-}
-
-private func base64URLEncode(_ data: Data) -> String {
-    data.base64EncodedString()
-        .replacingOccurrences(of: "+", with: "-")
-        .replacingOccurrences(of: "/", with: "_")
-        .replacingOccurrences(of: "=", with: "")
-}
-
-private func generatePKCE() -> (verifier: String, challenge: String) {
-    let verifier = base64URLEncode(generateRandomBytes(32))
-    let challengeData = SHA256.hash(data: Data(verifier.utf8))
-    let challenge = base64URLEncode(Data(challengeData))
-    return (verifier, challenge)
-}
 
 // MARK: - Auth Credentials
 
@@ -62,7 +38,7 @@ class AnthropicAuthManager: ObservableObject {
     /// Generates the OAuth authorization URL and stores the PKCE verifier.
     /// Returns the URL the user should open in their browser.
     func generateAuthorizationURL() -> URL {
-        let pkce = generatePKCE()
+        let pkce = PKCEHelper.generatePKCE()
         currentVerifier = pkce.verifier
         
         var components = URLComponents(string: "https://claude.ai/oauth/authorize")!

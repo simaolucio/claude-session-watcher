@@ -59,18 +59,7 @@ class ClaudeUsageManager: ObservableObject {
     private var textTimer: Timer?
     private let authManager = AnthropicAuthManager.shared
     
-    // ISO 8601 date formatter
-    private static let isoFormatter: ISO8601DateFormatter = {
-        let f = ISO8601DateFormatter()
-        f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return f
-    }()
-    
-    private static let isoFormatterNoFrac: ISO8601DateFormatter = {
-        let f = ISO8601DateFormatter()
-        f.formatOptions = [.withInternetDateTime]
-        return f
-    }()
+    // Parsing is delegated to ClaudeUsageParser
     
     private init() {}
     
@@ -205,133 +194,23 @@ class ClaudeUsageManager: ObservableObject {
     }
     
     private func parseUsageResponse(_ data: Data) {
-        do {
-            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                log("parseUsage: response is not a JSON object")
-                state = .error("Invalid response format.")
-                return
-            }
-            
-            log("parseUsage: keys=\(json.keys.sorted())")
-            
-            // Parse each usage bucket — try many possible key names
-            let fiveHour = parseBucket(json, key: "five_hour")
-                ?? parseBucket(json, key: "fiveHour")
-                ?? parseBucket(json, key: "5_hour")
-                ?? parseBucket(json, key: "short_term")
-                ?? parseBucket(json, key: "shortTerm")
-            
-            let dailyAll = parseBucket(json, key: "seven_day")
-                ?? parseBucket(json, key: "seven_day_all")
-                ?? parseBucket(json, key: "daily")
-                ?? parseBucket(json, key: "sevenDayAll")
-                ?? parseBucket(json, key: "7_day_all")
-                ?? parseBucket(json, key: "long_term")
-                ?? parseBucket(json, key: "longTerm")
-                ?? parseBucket(json, key: "weekly")
-            
-            let dailySonnet = parseBucket(json, key: "seven_day_sonnet")
-                ?? parseBucket(json, key: "daily_sonnet")
-                ?? parseBucket(json, key: "sevenDaySonnet")
-                ?? parseBucket(json, key: "7_day_sonnet")
-                ?? parseBucket(json, key: "sonnet")
-            
-            // If none of the known keys matched, try to parse the top-level keys dynamically
-            if fiveHour == nil && dailyAll == nil && dailySonnet == nil {
-                log("parseUsage: no known keys matched, attempting dynamic parse")
-                // Try all top-level keys as buckets
-                var buckets: [(String, UsageBucket)] = []
-                for (key, value) in json {
-                    if let dict = value as? [String: Any] {
-                        if let bucket = parseBucketFromDict(dict) {
-                            buckets.append((key, bucket))
-                            log("parseUsage: found bucket '\(key)': pct=\(bucket.percent)")
-                        }
-                    }
-                }
-                
-                if !buckets.isEmpty {
-                    let sorted = buckets.sorted { $0.0 < $1.0 }
-                    let usage = ClaudeUsage(
-                        fiveHour: sorted.count > 0 ? sorted[0].1 : UsageBucket(percent: 0, resetAt: nil),
-                        dailyAllModels: sorted.count > 1 ? sorted[1].1 : UsageBucket(percent: 0, resetAt: nil),
-                        dailySonnet: sorted.count > 2 ? sorted[2].1 : UsageBucket(percent: 0, resetAt: nil)
-                    )
-                    state = .loaded(usage)
-                    lastUpdateTime = Date()
-                    lastUpdateText = "just now"
-                    return
-                }
-                
-                state = .error("Unrecognized usage format. Keys: \(json.keys.sorted().joined(separator: ", "))")
-                return
-            }
-            
-            let usage = ClaudeUsage(
-                fiveHour: fiveHour ?? UsageBucket(percent: 0, resetAt: nil),
-                dailyAllModels: dailyAll ?? UsageBucket(percent: 0, resetAt: nil),
-                dailySonnet: dailySonnet ?? UsageBucket(percent: 0, resetAt: nil)
-            )
-            
+        let result = ClaudeUsageParser.parseResponse(data)
+        switch result {
+        case .success(let usage):
             log("parseUsage: success! 5h=\(usage.fiveHour.percent)% daily=\(usage.dailyAllModels.percent)% sonnet=\(usage.dailySonnet.percent)%")
             state = .loaded(usage)
             lastUpdateTime = Date()
             lastUpdateText = "just now"
-            
-        } catch {
-            log("parseUsage: JSON parse error: \(error)")
-            state = .error("Parse error: \(error.localizedDescription)")
-        }
-    }
-    
-    private func parseBucket(_ json: [String: Any], key: String) -> UsageBucket? {
-        // Try as nested object
-        if let bucket = json[key] as? [String: Any] {
-            return parseBucketFromDict(bucket)
-        }
-        
-        // Try as flat keys
-        if let utilization = json["\(key)_utilization"] as? Double {
-            let resetAt = parseDate(from: json, key: "\(key)_reset_at")
-            return UsageBucket(percent: clamp0100(utilization), resetAt: resetAt)
-        }
-        
-        return nil
-    }
-    
-    private func parseBucketFromDict(_ dict: [String: Any]) -> UsageBucket? {
-        let utilization = (dict["utilization"] as? Double)
-            ?? (dict["usage"] as? Double)
-            ?? (dict["percent"] as? Double).map { $0 / 100.0 }
-            ?? (dict["value"] as? Double)
-        
-        guard let util = utilization else { return nil }
-        
-        let resetAt = parseDate(from: dict, key: "reset_at")
-            ?? parseDate(from: dict, key: "resetAt")
-            ?? parseDate(from: dict, key: "resets_at")
-            ?? parseDate(from: dict, key: "reset")
-            ?? parseDate(from: dict, key: "expires_at")
-        
-        return UsageBucket(percent: clamp0100(util), resetAt: resetAt)
-    }
-    
-    private func parseDate(from dict: [String: Any], key: String) -> Date? {
-        if let str = dict[key] as? String {
-            return Self.isoFormatter.date(from: str)
-                ?? Self.isoFormatterNoFrac.date(from: str)
-        }
-        if let ts = dict[key] as? TimeInterval {
-            // Interpret as seconds since epoch if large enough, otherwise ignore
-            if ts > 1_000_000_000 {
-                return Date(timeIntervalSince1970: ts)
+        case .failure(let error):
+            switch error {
+            case .invalidJSON:
+                log("parseUsage: response is not a JSON object")
+                state = .error("Invalid response format.")
+            case .unrecognizedFormat(let keys):
+                log("parseUsage: no known keys matched")
+                state = .error("Unrecognized usage format. Keys: \(keys.joined(separator: ", "))")
             }
         }
-        return nil
-    }
-    
-    private func clamp0100(_ v: Double) -> Double {
-        min(max(v, 0), 100)
     }
     
     private func updateLastUpdateText() {
