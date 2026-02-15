@@ -12,7 +12,6 @@
 <p align="center">
   <a href="https://codequota.dev/"><img src="https://badgen.net/badge/website/codequota.dev/7D6BF5?icon=chrome" alt="Website"></a>
   <a href="https://github.com/simaolucio/CodeQuota/releases/latest"><img src="https://img.shields.io/github/v/release/simaolucio/CodeQuota" alt="Release"></a>
-  <img src="https://img.shields.io/badge/platform-macOS_13%2B-blue" alt="Platform">
   <img src="https://img.shields.io/badge/swift-5.9-F05138?logo=swift&logoColor=white" alt="Swift">
   <a href="https://github.com/simaolucio/CodeQuota/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
   <a href="https://ko-fi.com/P5P31U8CJQ"><img src="https://badgen.net/badge/Ko-fi/Buy%20me%20a%20coffee/FF5E5B?icon=kofi" alt="Ko-fi"></a>
