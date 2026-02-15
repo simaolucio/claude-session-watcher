@@ -9,7 +9,9 @@
 
 > **Track your Claude Pro/Max and GitHub Copilot usage limits in real time, right from your macOS menu bar.**
 
-**[codequota.dev](https://codequota.dev/)** · **[Buy me a coffee](https://ko-fi.com/P5P31U8CJQ)**
+[![Website](https://badgen.net/badge/website/codequota.dev/7D6BF5?icon=chrome)](https://codequota.dev/)
+[![Release](https://badgen.net/github/release/simaolucio/CodeQuota)](https://github.com/simaolucio/CodeQuota/releases/latest)
+[![Ko-fi](https://badgen.net/badge/Ko-fi/Buy%20me%20a%20coffee/FF5E5B?icon=kofi)](https://ko-fi.com/P5P31U8CJQ)
 
 ---
 
