@@ -6,5 +6,16 @@
         <title>CodeQuota Updates</title>
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
+  <item>
+      <title>Version 0.2.0</title>
+      <pubDate>Mon, 16 Feb 2026 00:12:00 +0000</pubDate>
+      <sparkle:version>0.2.0</sparkle:version>
+      <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>
+      <enclosure
+          url="https://github.com/simaolucio/CodeQuota/releases/download/v0.2.0/CodeQuota-v0.2.0.zip"
+          sparkle:edSignature="cb0bwKENJ+J+BbJt9+bIGChFBpxU9GxP5D+0WQ9JytiVpcwhmmEzDTAioGQ355yjqnOFUq1FpPIXPht3ZHk2Dg=="
+          length="2053839"
+          type="application/octet-stream" />
+  </item>
     </channel>
 </rss>
