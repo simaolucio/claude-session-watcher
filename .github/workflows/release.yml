@@ -101,23 +101,24 @@ jobs:
 
           cd gh-pages-repo
 
-          # Build the new item XML
-          NEW_ITEM="        <item>
+          # Build the new item XML in a temp file
+          cat > /tmp/new_item.xml <<XMLEOF
+            <item>
                 <title>Version ${VERSION_NUMBER}</title>
                 <pubDate>${PUB_DATE}</pubDate>
                 <sparkle:version>${VERSION_NUMBER}</sparkle:version>
                 <sparkle:shortVersionString>${VERSION_NUMBER}</sparkle:shortVersionString>
                 <enclosure
-                    url=\"${DOWNLOAD_URL}\"
-                    sparkle:edSignature=\"${ED_SIGNATURE}\"
-                    length=\"${FILE_LENGTH}\"
-                    type=\"application/octet-stream\" />
-            </item>"
+                    url="${DOWNLOAD_URL}"
+                    sparkle:edSignature="${ED_SIGNATURE}"
+                    length="${FILE_LENGTH}"
+                    type="application/octet-stream" />
+            </item>
+          XMLEOF
 
           # Insert the new item before the closing </channel> tag
           if [ -f appcast.xml ]; then
-            # Insert before </channel>
-            sed -i '' "s|    </channel>|${NEW_ITEM}\n    </channel>|" appcast.xml
+            python3 -c "item=open('/tmp/new_item.xml').read(); xml=open('appcast.xml').read(); xml=xml.replace('    </channel>',item+'    </channel>'); open('appcast.xml','w').write(xml)"
           else
             echo "appcast.xml not found on gh-pages"
             exit 0
